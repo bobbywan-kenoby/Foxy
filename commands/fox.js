@@ -27,7 +27,7 @@ module.exports = {
 					ctx.drawImage(image, 0, 0)
 
 					let attachment = new Discord.MessageAttachment(canvas.toBuffer(), "foxPicture.png");
-					message.channel.send(':fox: | **here is your random fancy fox**', attachment);
+					message.channel.send(':fox: | **here is your random fancy fox**', attachment);
 
 					console.timeEnd('message')
 				}).catch(err => {
