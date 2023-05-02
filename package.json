@@ -1,16 +1,20 @@
 {
-  "name": "Foxy",
+  "name": "foxy",
   "version": "1.0.0",
   "description": "simple bot for send a fox picture in the current discord channel",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "deploy": "node deploy-commands.js"
   },
   "author": "bobbywan-kenoby",
   "license": "ISC",
   "dependencies": {
-    "canvas": "^2.8.0",
-    "discord.js": "^12.5.3",
+    "discord.js": "^14.9.0",
     "https": "^1.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.39.0"
   }
 }
