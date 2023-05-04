@@ -1,8 +1,9 @@
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Collection, Events } = require('discord.js');
 const path = require('node:path');
 const fs = require('node:fs');
-
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const process = require('node:process');
+const { client } = require(process.cwd() + '/discordClient.js');
+const { configSave } = require(process.cwd() + '/utils.js');
 
 // Command handling
 client.commands = new Collection();
@@ -46,4 +47,10 @@ client.on(Events.InteractionCreate, async interaction => {
 			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 		}
 	}
+});
+
+process.on('SIGINT', () => {
+	console.log('bot shutdown');
+	configSave();
+	process.exit(0);
 });

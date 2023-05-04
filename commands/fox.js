@@ -1,18 +1,5 @@
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
-const https = require('https');
-
-const get_data = async (url) => {
-	return new Promise((resolve) => {
-		let data = '';
-
-		https.get(url, res => {
-			res.on('data', chunk => { data += chunk; });
-			res.on('end', () => {
-				resolve(data);
-			});
-		});
-	});
-};
+const { get_data } = require(process.cwd() + '/utils.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
