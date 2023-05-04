@@ -29,10 +29,10 @@ const createTask = (task) => {
 			.setImage(image_url)
 			.setTimestamp(new Date());
 
-		console.log('running a task every minute');
+		console.log('perform cron task');
 		const channel = client.channels.cache.get(task['channel']);
 		channel.send({ embeds: [embed] });
-	}), 'id': task['channel'] };
+	}, { timezone: 'Europe/Paris' }), 'id': task['channel'] };
 };
 
 const stopTask = (task) => {
