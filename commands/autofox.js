@@ -25,7 +25,7 @@ module.exports = {
 						.setDescription('The channel You to stop puting foxes'))),
 	async execute(interaction) {
 		if (interaction.options.getSubcommand() === 'start') {
-			const channelId = interaction.options.getUser('channel') ?? interaction.channelId;
+			const channelId = interaction.options.getChannel('channel') ?? interaction.channelId;
 			const time = interaction.options.getString('time');
 			if (testTime(time)) {
 				const channel = config['crontask'].filter(e => e['channel'] == channelId);
@@ -46,7 +46,7 @@ module.exports = {
 				await interaction.reply('You set a wrong time !\nplease follow this example: 8:30 for sending fox at 8:30am and 20:30 for 8:30pm');
 			}
 		} else if (interaction.options.getSubcommand() === 'stop') {
-			const channelId = interaction.options.getUser('channel') ?? interaction.channelId;
+			const channelId = interaction.options.getChannel('channel') ?? interaction.channelId;
 			const channel = config['crontask'].filter(e => e['channel'] == channelId);
 			if (channel.length == 0) {
 				await interaction.reply('autofox wasn\'t configure in this channel');
