@@ -30,13 +30,13 @@ const createTask = (task) => {
 			.setTimestamp(new Date());
 
 		console.log('perform cron task');
-		const channel = client.channels.cache.get(task['channel']);
+		const channel = client.channels.cache.get(task['channelId']);
 		channel.send({ embeds: [embed] });
-	}, { timezone: 'Europe/Paris' }), 'id': task['channel'] };
+	}, { timezone: 'Europe/Paris' }), 'id': task['channelId'] };
 };
 
 const stopTask = (task) => {
-	const test = tasks.filter(t => t['id'] == task['channel']);
+	const test = tasks.filter(t => t['id'] == task['channelId']);
 	if (test.length == 0) {
 		console.log('this task doesn\'t exist');
 	} else {
@@ -45,7 +45,7 @@ const stopTask = (task) => {
 };
 
 const removeTask = (task) => {
-	const test = tasks.filter(t => t['id'] == task['channel']);
+	const test = tasks.filter(t => t['id'] == task['channelId']);
 	if (test.length == 0) {
 		console.log('this task doesn\'t exist');
 	} else {
