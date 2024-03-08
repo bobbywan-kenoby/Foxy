@@ -1,22 +1,4 @@
 const https = require('https');
-const fs = require('node:fs');
-
-const configFile = process.cwd() + '/data/config.json';
-
-const config = fs.existsSync(configFile) ? (() => {
-	const obj = require(configFile);
-	console.log('load config ', obj);
-	return obj;
-})() : { 'crontask': [] };
-
-const configSave = () => {
-	console.log(config);
-	try {
-		fs.writeFileSync(configFile, JSON.stringify(config), 'utf8');
-	} catch (err) {
-		console.error(err);
-	}
-};
 
 const get_data = async (url) => {
 	return new Promise((resolve) => {
@@ -31,4 +13,4 @@ const get_data = async (url) => {
 	});
 };
 
-module.exports = { config, get_data, configSave };
+module.exports = { get_data };

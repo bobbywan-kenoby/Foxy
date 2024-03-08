@@ -38,14 +38,16 @@ module.exports = {
 			}
 		} else if (interaction.options.getSubcommand() === 'stop') {
 
-			if (autofox.tasks.length < 1) {
+			const tasks = autofox.tasks.filter(t => t.channel.guild.id == interaction.guildId);
+
+			if (tasks.length < 1) {
 				await interaction.reply({
 					content: 'no autofox is register in this server',
 				});
 				return ;
 			}
 
-			const button = autofox.tasks.map((t, i) => {
+			const button = tasks.map((t, i) => {
 				return new ButtonBuilder()
 					.setCustomId(`${i}`)
 					.setLabel(`${t.channel.name} at ${t.time[0]}:${t.time[1]}`)
