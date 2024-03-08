@@ -1,7 +1,7 @@
 const https = require('https');
 const fs = require('node:fs');
 
-const configFile = process.cwd() + '/config.json';
+const configFile = process.cwd() + '/data/config.json';
 
 const config = fs.existsSync(configFile) ? (() => {
 	const obj = require(configFile);

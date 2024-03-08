@@ -1,7 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { config } = require(process.cwd() + '/utils.js');
-const { tasks, createTask, testTime, removeTask } = require(process.cwd() + '/cronTask.js');
-const { client } = require(process.cwd() + '/discordClient.js');
+const { SlashCommandBuilder, ButtonBuilder, ActionRowBuilder, ButtonStyle } = require('discord.js');
+const { autofox } = require(process.cwd() + '/src/Autofox.js');
+const { save } = require(process.cwd() + '/src/SaveData.js');
+const { client } = require(process.cwd() + '/src/discordClient.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,52 +20,58 @@ module.exports = {
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('stop')
-				.setDescription('stop autofox')
-				.addChannelOption(option =>
-					option.setName('channel')
-						.setDescription('The channel You to stop puting foxes'))),
+				.setDescription('stop autofox')),
 	async execute(interaction) {
 		if (interaction.options.getSubcommand() === 'start') {
 			// get command args
 			const channel = interaction.options.getChannel('channel') ?? client.channels.cache.get(interaction.channelId);
 			const time = interaction.options.getString('time');
 
-			// test if time was correct
-			if (testTime(time)) {
-				// detect if task already register
-				const taskConfig = config['crontask'].filter(e => e['channelId'] == channel.id);
-				let task = null;
-				if (taskConfig.length == 0) {
-					// task not find => create task
-					task = { 'channelId': channel.id, 'time': time };
-					config['crontask'].push(task);
-					console.log(`channel ${channel.name} register at ${time}`);
-				} else {
-					// task find => update time
-					const configIdx = config['crontask'].indexOf(taskConfig[0]);
-					config['crontask'][configIdx]['time'] = time;
-					task = config['crontask'][configIdx];
-					// remove task for recreate it
-					removeTask(task);
-					console.log(`change time to ${time} for ${channel.name}`);
-				}
-				tasks.push(createTask(task));
+			try {
+				autofox.addTask(channel, time);
+				save.save();
 				await interaction.reply(`autofox is configure enjoy your daily fox in ${channel.name} at ${time} !`);
-			} else {
+			} catch (error) {
+				console.log(error);
+				// parse error
 				await interaction.reply('You set a wrong time !\nplease follow this example: 8:30 for sending fox at 8:30am and 20:30 for 8:30pm');
 			}
 		} else if (interaction.options.getSubcommand() === 'stop') {
-			const channel = interaction.options.getChannel('channel') ?? client.channels.cache.get(interaction.channelId);
-			const taskConfig = config['crontask'].filter(e => e['channelId'] == channel.id);
-			if (taskConfig.length == 0) {
-				await interaction.reply(`autofox wasn't configure in the channel ${channel.name}`);
-			} else {
-				const configIdx = config['crontask'].indexOf(taskConfig[0]);
-				const task = config['crontask'][configIdx];
-				removeTask(task);
-				config['crontask'].splice(configIdx, 1);
-				console.log('task suppress successfully');
-				await interaction.reply(`autofox will no longer send fox in the channel ${channel.name}`);
+
+			if (autofox.tasks.length < 1) {
+				await interaction.reply({
+					content: 'no autofox is register in this server',
+				});
+				return ;
+			}
+
+			const button = autofox.tasks.map((t, i) => {
+				return new ButtonBuilder()
+					.setCustomId(`${i}`)
+					.setLabel(`${t.channel.name} at ${t.time[0]}:${t.time[1]}`)
+					.setStyle(ButtonStyle.Primary);
+			});
+
+			const row = new ActionRowBuilder()
+				.addComponents(...button);
+
+
+			const response = await interaction.reply({
+				content: 'which autofox do you want to stop ?',
+				components: [row],
+			});
+
+			const collectorFilter = i => i.user.id === interaction.user.id;
+
+			try {
+				const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
+				const task = autofox.tasks[Number(confirmation.customId)];
+
+				autofox.removeTask(Number(confirmation.customId));
+				save.save();
+				await confirmation.update({ content: `autofox in ${task.channel.name} at ${task.time[0]}:${task.time[1]} successfully remove`, components: [] });
+			} catch (e) {
+				await interaction.editReply({ content: 'Confirmation not received within 1 minute, cancelling', components: [] });
 			}
 		}
 	},
